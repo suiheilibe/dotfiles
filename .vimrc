@@ -1,4 +1,3 @@
-syntax on
 set tabstop=4
 set shiftwidth=4
 set number
@@ -20,11 +19,12 @@ set encoding=utf-8
 set laststatus=2
 set statusline=%F\ %h%m%r%w%=[%Y][%{(&fenc!=''?&fenc:&enc)}][%{&ff}]%8l,%-8(%c%V%)%4p%%
 
-set nocompatible               " Be iMproved
-
 if has('vim_starting')
   set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
+  set rtp+=$GOROOT/misc/vim
 endif
+
+syntax on
 
 call neobundle#rc(expand('$HOME/.vim/bundle/'))
 
@@ -37,10 +37,14 @@ NeoBundle 'Shougo/vimproc'
 
 " My Bundles here:
 "
+NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'jdonaldson/vaxe'
 NeoBundle 'dag/vim2hs'
+NeoBundle 'eagletmt/neco-ghc'
+NeoBundle 'eagletmt/ghcmod-vim'
+NeoBundle 'kana/vim-filetype-haskell'
 
 filetype plugin indent on     " Required!
 "
@@ -58,13 +62,29 @@ if neobundle#exists_not_installed_bundles()
 endif
 
 " For CoffeeScript
+
+augroup coffee
+autocmd!
 autocmd BufWritePost *.coffee silent :make
 autocmd FileType coffee setl tabstop=2 expandtab shiftwidth=2 softtabstop=2
+augroup END
 
 " For Haxe
 
+augroup haxe
+autocmd!
 autocmd BufEnter * execute 'lcd ' fnameescape(expand('%:p:h'))
+augroup END
 
 " For Go
 
-set rtp+=$GOROOT/misc/vim
+" For neocomplete
+
+let g:neocomplete#enable_at_startup = 1
+
+" For Haskell
+
+augroup haskell
+autocmd!
+autocmd FileType haskell setl tabstop=8 expandtab softtabstop=4 shiftwidth=4 shiftround
+augroup END
