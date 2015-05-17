@@ -29,7 +29,7 @@ syntax on
 call neobundle#rc(expand('$HOME/.vim/bundle/'))
 
 " Let NeoBundle manage NeoBundle
-"NeoBundleLazy 'Shougo/neobundle.vim'
+NeoBundleLazy 'Shougo/neobundle.vim'
 
 " Recommended to install
 " After install, turn shell ~/.vim/bundle/vimproc, (n,g)make -f your_machines_makefile
@@ -41,10 +41,23 @@ NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'kchmck/vim-coffee-script'
 NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'jdonaldson/vaxe'
-NeoBundle 'dag/vim2hs'
 NeoBundle 'eagletmt/neco-ghc'
 NeoBundle 'eagletmt/ghcmod-vim'
-NeoBundle 'kana/vim-filetype-haskell'
+NeoBundle 'lambdatoast/elm.vim'
+NeoBundle 'leafgarland/typescript-vim'
+NeoBundle 'jason0x43/vim-js-indent'
+NeoBundleLazy 'Shougo/unite.vim', {
+\   'autoload' : {
+\       'commands' : [ "Unite", "UniteWithCursorWord" ]
+\   }
+\}
+NeoBundle 'ujihisa/unite-haskellimport'
+NeoBundle 'thinca/vim-quickrun'
+NeoBundle 'cohama/vim-hier'
+NeoBundle 'osyo-manga/shabadou.vim'
+NeoBundle 'osyo-manga/vim-watchdogs'
+NeoBundle 'raichoo/haskell-vim'
+NeoBundle 'enomsg/vim-haskellConcealPlus'
 
 filetype plugin indent on     " Required!
 "
@@ -66,6 +79,7 @@ endif
 augroup coffee
 autocmd!
 autocmd BufWritePost *.coffee silent :make
+autocmd QuickFixCmdPost * nested cwindow | redraw!
 autocmd FileType coffee setl tabstop=2 expandtab shiftwidth=2 softtabstop=2
 augroup END
 
@@ -78,13 +92,102 @@ augroup END
 
 " For Go
 
-" For neocomplete
+" neocomplete
 
+" Use neocomplete.
 let g:neocomplete#enable_at_startup = 1
+" Use smartcase.
+let g:neocomplete#enable_smart_case = 1
+" Set minimum syntax keyword length.
+let g:neocomplete#sources#syntax#min_keyword_length = 3
+let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
+
+" Define dictionary.
+let g:neocomplete#sources#dictionary#dictionaries = {
+	\ 'default' : '',
+	\ 'vimshell' : $HOME.'/.vimshell_hist',
+	\ 'scheme' : $HOME.'/.gosh_completions'
+\ }
+
+" Define keyword.
+if !exists('g:neocomplete#keyword_patterns')
+	let g:neocomplete#keyword_patterns = {}
+endif
+let g:neocomplete#keyword_patterns['default'] = '\h\w*'
+
+" Plugin key-mappings.
+inoremap <expr><C-g>     neocomplete#undo_completion()
+inoremap <expr><C-l>     neocomplete#complete_common_string()
+
+" Recommended key-mappings.
+" <CR>: close popup and save indent.
+inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+function! s:my_cr_function()
+  "return neocomplete#close_popup() . "\<CR>"
+  " For no inserting <CR> key.
+  return pumvisible() ? neocomplete#close_popup() : "\<CR>"
+endfunction
+" <TAB>: completion.
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+" <C-h>, <BS>: close popup and delete backword char.
+inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+inoremap <expr><C-y>  neocomplete#close_popup()
+inoremap <expr><C-e>  neocomplete#cancel_popup()
+
+" Enable omni completion.
+autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+
+" Enable heavy omni completion.
+if !exists('g:neocomplete#sources#omni#input_patterns')
+  let g:neocomplete#sources#omni#input_patterns = {}
+endif
 
 " For Haskell
 
 augroup haskell
 autocmd!
-autocmd FileType haskell setl tabstop=8 expandtab softtabstop=4 shiftwidth=4 shiftround
+autocmd FileType haskell setl tabstop=4 expandtab softtabstop=4 shiftwidth=4 shiftround
 augroup END
+
+let g:hscoptions="liRtBQZ"
+
+" For TypeScript
+
+" typescript-vim
+let g:typescript_compiler_options = ' --module commonjs --target ES5 --noImplicitAny'
+
+augroup typescript
+autocmd!
+autocmd QuickFixCmdPost [^l]* nested cwindow
+autocmd QuickFixCmdPost    l* nested lwindow
+autocmd FileType typescript setl tabstop=4 expandtab shiftwidth=4 softtabstop=4
+augroup END
+
+" watchdogs.vim setting
+"let g:watchdogs_check_BufWritePost_enable = 1
+let g:watchdogs_check_BufWritePost_enables = {
+\   "typescript" : 1
+\}
+
+"let g:watchdogs_check_CursorHold_enable = 1
+let g:watchdogs_check_CursorHold_enables = {
+\   "typescript" : 1
+\}
+
+if !exists("g:quickrun_config")
+    let g:quickrun_config = {}
+endif
+let g:quickrun_config["watchdogs_checker/_"] = {
+\	"hook/copen/enable_exist_data" : 1,
+\	"hook/back_window/enable_exit" : 1,
+\	"hook/back_window/priority_exit" : 100,
+\}
+let g:quickrun_config["watchdogs_checker/tsc"] = {
+\	"exec"		: "%c %o %s:p",
+\	"cmdopt"	: "--module commonjs --target ES5 --noImplicitAny",
+\}
