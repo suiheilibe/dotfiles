@@ -26,7 +26,7 @@ endif
 
 syntax on
 
-call neobundle#rc(expand('$HOME/.vim/bundle/'))
+call neobundle#begin(expand('$HOME/.vim/bundle/'))
 
 " Let NeoBundle manage NeoBundle
 NeoBundleLazy 'Shougo/neobundle.vim'
@@ -58,6 +58,9 @@ NeoBundle 'osyo-manga/shabadou.vim'
 NeoBundle 'osyo-manga/vim-watchdogs'
 NeoBundle 'raichoo/haskell-vim'
 NeoBundle 'enomsg/vim-haskellConcealPlus'
+
+" End of NeoBundle
+call neobundle#end()
 
 filetype plugin indent on     " Required!
 "
