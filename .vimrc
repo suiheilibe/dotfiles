@@ -22,6 +22,7 @@ set statusline=%F\ %h%m%r%w%=[%Y][%{(&fenc!=''?&fenc:&enc)}][%{&ff}]%8l,%-8(%c%V
 if has('vim_starting')
   set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
   set rtp+=$GOROOT/misc/vim
+  set runtimepath+=$HOME/vimfiles/,$HOME/vimfiles/after/
 endif
 
 syntax on
@@ -194,3 +195,7 @@ let g:quickrun_config["watchdogs_checker/tsc"] = {
 \	"exec"		: "%c %o %s:p",
 \	"cmdopt"	: "--module commonjs --target ES5 --noImplicitAny",
 \}
+
+" solarized
+set background=light
+colorscheme solarized
